@@ -163,7 +163,10 @@ export default function ReportsPage() {
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} tickFormatter={(value) => `$${value / 1000}k`} />
                   <Tooltip
                     contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px" }}
-                    formatter={(value: number) => [`$${value.toLocaleString()}`, ""]}
+                    formatter={(value) => [
+                      value !== undefined ? `$${Number(value).toLocaleString("en-IN")}` : "",
+                      "",
+                    ]}
                   />
                   <Area type="monotone" dataKey="revenue" stroke="#22c55e" strokeWidth={2} fill="url(#revenueGradient)" name="Revenue" />
                   <Area type="monotone" dataKey="expenses" stroke="#f59e0b" strokeWidth={2} fill="url(#expensesGradient)" name="Expenses" />
@@ -187,7 +190,11 @@ export default function ReportsPage() {
                   <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} width={80} />
                   <Tooltip
                     contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px" }}
-                    formatter={(value: number) => [`$${value.toLocaleString()}`, "Sales"]}
+                    formatter={(value) => [
+                      value !== undefined ? `$${Number(value).toLocaleString("en-IN")}` : "",
+                      "Sales",
+                    ]}
+
                   />
                   <Bar dataKey="sales" fill="#14b8a6" radius={[0, 4, 4, 0]} />
                 </BarChart>
@@ -229,7 +236,7 @@ export default function ReportsPage() {
                   item.type === "deduction" || item.type === "credit" ? "text-rose-500" : "",
                   index === taxReport.length - 1 && "text-lg text-emerald-600"
                 )}>
-                  {item.value < 0 ? "-" : ""}${Math.abs(item.value).toLocaleString()}
+                  {item.value < 0 ? "-" : ""}${Math.abs(item.value).toLocaleString("en-IN")}
                 </span>
               </div>
             ))}
