@@ -1,0 +1,261 @@
+"use client"
+
+import { useState, useEffect, type ReactNode } from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import {
+  LayoutDashboard,
+  Receipt,
+  Package,
+  Users,
+  BarChart3,
+  Calculator,
+  Settings,
+  HardDrive,
+  ChevronLeft,
+  ChevronRight,
+  Wifi,
+  WifiOff,
+  Bell,
+  LogOut,
+} from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
+const navigation = [
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Billing", href: "/billing", icon: Receipt },
+  { name: "Inventory", href: "/inventory", icon: Package },
+  { name: "Users", href: "/users", icon: Users },
+  { name: "Reports", href: "/reports", icon: BarChart3 },
+  { name: "Accounting", href: "/accounting", icon: Calculator },
+  { name: "Utilities", href: "/utilities", icon: HardDrive },
+  { name: "Settings", href: "/settings", icon: Settings },
+]
+
+interface AppShellProps {
+  children: ReactNode
+  user?: {
+    name: string
+    role: "Admin" | "Cashier"
+    avatar?: string
+  }
+}
+
+export function AppShell({ children, user = { name: "John Doe", role: "Admin" } }: AppShellProps) {
+  const [collapsed, setCollapsed] = useState(false)
+  const [isOnline, setIsOnline] = useState(true)
+  const [currentTime, setCurrentTime] = useState(new Date())
+  const [mounted, setMounted] = useState(false)
+  const pathname = usePathname()
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+
+    setIsOnline(navigator.onLine)
+    window.addEventListener("online", handleOnline)
+    window.addEventListener("offline", handleOffline)
+
+    return () => {
+      window.removeEventListener("online", handleOnline)
+      window.removeEventListener("offline", handleOffline)
+    }
+  }, [])
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  return (
+    <div className="flex h-screen bg-background">
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "relative flex flex-col bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out",
+          collapsed ? "w-[72px]" : "w-64"
+        )}
+      >
+        {/* Logo */}
+        <div className="flex h-16 items-center gap-3 px-4 border-b border-sidebar-border">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500">
+            <Receipt className="size-5 text-white" />
+          </div>
+          {!collapsed && (
+            <span className="text-xl font-bold text-emerald-400">
+              NexBill
+            </span>
+          )}
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 space-y-1 p-3 overflow-y-auto">
+          {navigation.map((item) => {
+            const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={cn(
+                  "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                  isActive
+                    ? "bg-sidebar-accent text-sidebar-primary"
+                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                )}
+              >
+                {isActive && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-full bg-emerald-500" />
+                )}
+                <item.icon className={cn("size-5 shrink-0", isActive && "text-emerald-400")} />
+                {!collapsed && <span>{item.name}</span>}
+              </Link>
+            )
+          })}
+        </nav>
+
+        {/* Collapse Toggle */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setCollapsed(!collapsed)}
+          className="absolute -right-3 top-20 size-6 rounded-full border border-sidebar-border bg-sidebar shadow-md hover:bg-sidebar-accent"
+        >
+          {collapsed ? (
+            <ChevronRight className="size-3" />
+          ) : (
+            <ChevronLeft className="size-3" />
+          )}
+        </Button>
+
+        {/* User Section */}
+        <div className="border-t border-sidebar-border p-3">
+          <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
+            <Avatar className="size-9 border-2 border-sidebar-accent">
+              <AvatarImage src={user.avatar || "/placeholder.svg"} />
+              <AvatarFallback className="bg-emerald-500 text-white text-xs">
+                {user.name.split(" ").map((n) => n[0]).join("")}
+              </AvatarFallback>
+            </Avatar>
+            {!collapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{user.name}</p>
+                <Badge
+                  variant="secondary"
+                  className={cn(
+                    "text-[10px] px-1.5 py-0",
+                    user.role === "Admin"
+                      ? "bg-emerald-500/20 text-emerald-400"
+                      : "bg-cyan-500/20 text-cyan-400"
+                  )}
+                >
+                  {user.role}
+                </Badge>
+              </div>
+            )}
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Top Bar */}
+        <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              {isOnline ? (
+                <Wifi className="size-4 text-emerald-500" />
+              ) : (
+                <WifiOff className="size-4 text-destructive" />
+              )}
+              <span className={cn("text-xs font-medium", isOnline ? "text-emerald-500" : "text-destructive")}>
+                {isOnline ? "Online" : "Offline"}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6">
+            {/* Clock */}
+            <div className="text-right">
+              <p className="text-sm font-semibold font-mono text-foreground">
+                {mounted
+                  ? currentTime.toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  })
+                  : "--:--:--"}
+              </p>
+
+              <p className="text-xs text-muted-foreground">
+                {mounted
+                  ? currentTime.toLocaleDateString("en-US", {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                  })
+                  : ""}
+              </p>
+
+            </div>
+
+            {/* Notifications */}
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="size-5" />
+              <span className="absolute -top-0.5 -right-0.5 size-4 rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground flex items-center justify-center">
+                3
+              </span>
+            </Button>
+
+            {/* User Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-2">
+                  <Avatar className="size-8">
+                    <AvatarImage src={user.avatar || "/placeholder.svg"} />
+                    <AvatarFallback className="bg-emerald-500 text-white text-xs">
+                      {user.name.split(" ").map((n) => n[0]).join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium">{user.name}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Settings className="mr-2 size-4" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-destructive">
+                  <LogOut className="mr-2 size-4" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-y-auto">
+          {children}
+        </main>
+      </div>
+    </div>
+  )
+}
