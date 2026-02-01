@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Receipt, Eye, EyeOff, Shield, Zap } from "lucide-react"
+import Image from "next/image"
 
 type Role = "Admin" | "Cashier"
 
@@ -33,15 +34,12 @@ export default function LoginPage() {
       {/* Left Branding Panel */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-14 bg-gradient-to-br from-emerald-50 to-slate-100">
         {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div className="flex size-11 items-center justify-center rounded-xl bg-emerald-500 shadow-md">
-            <Receipt className="size-6 text-white" />
-          </div>
-          <span className="text-2xl font-bold text-slate-900">
-            NexBill
-          </span>
-        </div>
-
+        <Image
+          src="/logo.png"
+          alt="NexBill Logo"
+          width={200}
+          height={200}
+        />
         {/* Heading */}
         <div className="space-y-6">
           <h1 className="text-5xl font-bold text-slate-900 leading-tight">
@@ -82,12 +80,12 @@ export default function LoginPage() {
         <div className="w-full max-w-md rounded-2xl bg-white shadow-xl border p-10 space-y-8">
           {/* Mobile Logo */}
           <div className="lg:hidden flex justify-center items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-emerald-500">
-              <Receipt className="size-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-slate-900">
-              NexBill
-            </span>
+            <Image
+              src="/logo.png"
+              alt="NexBill Logo"
+              width={200}
+              height={200}
+            />
           </div>
 
           {/* Title */}
