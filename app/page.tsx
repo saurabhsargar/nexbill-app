@@ -29,63 +29,83 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-slate-950">
-      {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-slate-900">
+    <div className="min-h-screen flex bg-slate-50">
+      {/* Left Branding Panel */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-14 bg-gradient-to-br from-emerald-50 to-slate-100">
+        {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-500">
-            <Receipt className="size-5 text-white" />
+          <div className="flex size-11 items-center justify-center rounded-xl bg-emerald-500 shadow-md">
+            <Receipt className="size-6 text-white" />
           </div>
-          <span className="text-xl font-semibold text-white">NexBill</span>
+          <span className="text-2xl font-bold text-slate-900">
+            NexBill
+          </span>
         </div>
-        
+
+        {/* Heading */}
         <div className="space-y-6">
-          <h1 className="text-4xl font-bold text-white leading-tight text-balance">
-            Enterprise Billing & POS System
+          <h1 className="text-5xl font-bold text-slate-900 leading-tight">
+            Billing & POS Simplified.
           </h1>
-          <p className="text-lg text-slate-400 max-w-md">
-            Streamline your business operations with real-time inventory tracking, smart billing, and comprehensive analytics.
+          <p className="text-lg text-slate-600 max-w-md">
+            Manage sales, GST invoices, inventory, and business analytics —
+            all in one modern platform.
           </p>
-          <div className="flex items-center gap-8 pt-4">
-            <div>
-              <p className="text-3xl font-bold text-emerald-400">10K+</p>
-              <p className="text-sm text-slate-500">Active Users</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold text-emerald-400">99.9%</p>
-              <p className="text-sm text-slate-500">Uptime</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold text-emerald-400">24/7</p>
-              <p className="text-sm text-slate-500">Support</p>
-            </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-6 pt-6">
+            {[
+              { value: "10K+", label: "Active Users" },
+              { value: "99.9%", label: "Uptime" },
+              { value: "24/7", label: "Support" },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="rounded-xl bg-white shadow-sm border p-4 text-center"
+              >
+                <p className="text-2xl font-bold text-emerald-600">
+                  {item.value}
+                </p>
+                <p className="text-sm text-slate-500">{item.label}</p>
+              </div>
+            ))}
           </div>
         </div>
-        
-        <p className="text-sm text-slate-600">
-          NexBill v1.0.0 - Enterprise Edition
+
+        <p className="text-sm text-slate-400">
+          NexBill v1.0.0 — Enterprise Edition
         </p>
       </div>
 
-      {/* Right Panel - Login Form */}
+      {/* Right Login Panel */}
       <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
+        <div className="w-full max-w-md rounded-2xl bg-white shadow-xl border p-10 space-y-8">
           {/* Mobile Logo */}
-          <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-500">
+          <div className="lg:hidden flex justify-center items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-emerald-500">
               <Receipt className="size-5 text-white" />
             </div>
-            <span className="text-xl font-semibold text-white">NexBill</span>
+            <span className="text-xl font-bold text-slate-900">
+              NexBill
+            </span>
           </div>
 
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-white">Welcome back</h2>
-            <p className="text-slate-400">Sign in to your account to continue</p>
+          {/* Title */}
+          <div className="space-y-2 text-center">
+            <h2 className="text-3xl font-bold text-slate-900">
+              Welcome Back 👋
+            </h2>
+            <p className="text-slate-500 text-sm">
+              Login to continue managing your business
+            </p>
           </div>
 
           {/* Role Selector */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium text-slate-300">Select Role</Label>
+            <Label className="text-sm font-medium text-slate-700">
+              Select Role
+            </Label>
+
             <div className="flex gap-3">
               {(["Admin", "Cashier"] as const).map((r) => (
                 <button
@@ -93,13 +113,17 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setRole(r)}
                   className={cn(
-                    "flex-1 flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200 border",
+                    "flex-1 flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium border transition",
                     role === r
-                      ? "bg-emerald-500 text-white border-emerald-500"
-                      : "bg-slate-800/50 text-slate-300 border-slate-700 hover:bg-slate-800 hover:border-slate-600"
+                      ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
+                      : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200"
                   )}
                 >
-                  {r === "Admin" ? <Shield className="size-4" /> : <Zap className="size-4" />}
+                  {r === "Admin" ? (
+                    <Shield className="size-4" />
+                  ) : (
+                    <Zap className="size-4" />
+                  )}
                   {r}
                 </button>
               ))}
@@ -108,76 +132,74 @@ export default function LoginPage() {
 
           {/* Form */}
           <form onSubmit={handleLogin} className="space-y-5">
+            {/* Email */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-slate-300">
-                Email Address
-              </Label>
+              <Label className="text-slate-700">Email Address</Label>
               <Input
-                id="email"
                 type="email"
                 placeholder="admin@nexbill.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-11 rounded-lg border-slate-700 bg-slate-800/50 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20"
-                required
+                className="h-11 rounded-xl border-slate-200 bg-slate-50 focus:border-emerald-500 focus:ring-emerald-500"
               />
             </div>
 
+            {/* Password */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-slate-300">
-                Password
-              </Label>
+              <Label className="text-slate-700">Password</Label>
               <div className="relative">
                 <Input
-                  id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder="Enter password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-11 rounded-lg border-slate-700 bg-slate-800/50 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 pr-12"
-                  required
+                  className="h-11 rounded-xl border-slate-200 bg-slate-50 focus:border-emerald-500 focus:ring-emerald-500 pr-12"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
-                  {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+                  {showPassword ? (
+                    <EyeOff className="size-5" />
+                  ) : (
+                    <Eye className="size-5" />
+                  )}
                 </button>
               </div>
             </div>
 
+            {/* Remember + Forgot */}
             <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
+              <label className="flex items-center gap-2 text-sm text-slate-600">
                 <input
                   type="checkbox"
-                  className="size-4 rounded border-slate-600 bg-slate-800 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-slate-950"
+                  className="size-4 rounded border-slate-300 text-emerald-500"
                 />
-                <span className="text-sm text-slate-400">Remember me</span>
+                Remember me
               </label>
-              <button type="button" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
+
+              <button
+                type="button"
+                className="text-sm text-emerald-600 hover:underline"
+              >
                 Forgot password?
               </button>
             </div>
 
+            {/* Submit */}
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full h-11 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-11 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold shadow-md"
             >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <div className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Signing in...
-                </div>
-              ) : (
-                `Sign in as ${role}`
-              )}
+              {isLoading ? "Signing in..." : `Sign in as ${role}`}
             </Button>
           </form>
 
-          <p className="text-center text-xs text-slate-500">
-            Secure login with 256-bit encryption
+          {/* Footer */}
+          <p className="text-center text-xs text-slate-400">
+            Secure login protected with encryption 🔒
           </p>
         </div>
       </div>
