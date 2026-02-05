@@ -10,12 +10,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Receipt, Eye, EyeOff, Shield, Zap } from "lucide-react"
 import Image from "next/image"
+import { loginUser } from "@/lib/api"
+import { setSession } from "@/lib/auth"
 
-type Role = "Admin" | "Cashier"
 
 export default function LoginPage() {
   const router = useRouter()
-  const [role, setRole] = useState<Role>("Admin")
+  const [role, setRole] = useState<"Admin" | "Cashier">("Admin")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
@@ -24,10 +25,36 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    // Simulate login
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    router.push("/dashboard")
+
+    try {
+      const data = await loginUser(email, password)
+
+      // backend returns { access_token }
+      setSession(data.access_token)
+
+      // fetch user from backend (authoritative)
+      const payload = JSON.parse(
+        atob(data.access_token.split(".")[1])
+      )
+
+      const backendRole = payload.role as "ADMIN" | "MANAGER" | "CASHIER"
+
+      // role-based redirect (REAL)
+      if (backendRole === "ADMIN") {
+        router.push("/dashboard")
+      } else if (backendRole === "MANAGER") {
+        router.push("/inventory")
+      } else {
+        router.push("/billing")
+      }
+
+    } catch (err) {
+      alert("Invalid email or password")
+    } finally {
+      setIsLoading(false)
+    }
   }
+
 
   return (
     <div className="min-h-screen flex bg-slate-50">
