@@ -16,7 +16,6 @@ import { setSession } from "@/lib/auth"
 
 export default function LoginPage() {
   const router = useRouter()
-  const [role, setRole] = useState<"Admin" | "Cashier">("Admin")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
@@ -125,36 +124,6 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Role Selector */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-slate-700">
-              Select Role
-            </Label>
-
-            <div className="flex gap-3">
-              {(["Admin", "Cashier"] as const).map((r) => (
-                <button
-                  key={r}
-                  type="button"
-                  onClick={() => setRole(r)}
-                  className={cn(
-                    "flex-1 flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium border transition",
-                    role === r
-                      ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
-                      : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200"
-                  )}
-                >
-                  {r === "Admin" ? (
-                    <Shield className="size-4" />
-                  ) : (
-                    <Zap className="size-4" />
-                  )}
-                  {r}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Form */}
           <form onSubmit={handleLogin} className="space-y-5">
             {/* Email */}
@@ -218,7 +187,7 @@ export default function LoginPage() {
               disabled={isLoading}
               className="w-full h-11 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold shadow-md"
             >
-              {isLoading ? "Signing in..." : `Sign in as ${role}`}
+              {isLoading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
 

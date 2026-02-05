@@ -2,7 +2,7 @@
 
 import { useState, useEffect, type ReactNode } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -32,30 +32,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { clearSession } from "@/lib/auth"
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Billing", href: "/billing", icon: Receipt },
-  { name: "Inventory", href: "/inventory", icon: Package },
-  { name: "Users", href: "/users", icon: Users },
-  { name: "Reports", href: "/reports", icon: BarChart3 },
-  { name: "Accounting", href: "/accounting", icon: Calculator },
-  { name: "Utilities", href: "/utilities", icon: HardDrive },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["ADMIN", "MANAGER"] },
+  { name: "Billing", href: "/billing", icon: Receipt, roles: ["ADMIN", "MANAGER", "CASHIER"] },
+  { name: "Inventory", href: "/inventory", icon: Package, roles: ["ADMIN", "MANAGER"] },
+  { name: "Users", href: "/users", icon: Users, roles: ["ADMIN"] },
+  { name: "Reports", href: "/reports", icon: BarChart3, roles: ["ADMIN", "MANAGER"] },
+  { name: "Accounting", href: "/accounting", icon: Calculator, roles: ["ADMIN"] },
+  { name: "Utilities", href: "/utilities", icon: HardDrive, roles: ["ADMIN"] },
+  { name: "Settings", href: "/settings", icon: Settings, roles: ["ADMIN", "MANAGER"] },
 ]
 
 interface AppShellProps {
   children: ReactNode
-  user?: {
+  user: {
     name: string
-    role: "Admin" | "Cashier"
+    role: "ADMIN" | "MANAGER" | "CASHIER"
     avatar?: string
   }
 }
 
 export function AppShell({
   children,
-  user = { name: "John Doe", role: "Admin" },
+  user,
 }: AppShellProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
@@ -83,6 +84,14 @@ export function AppShell({
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  const router = useRouter();
+
+  const handleLogout = () => {
+    clearSession();
+    router.push("/");
+  };
+
 
   return (
     <div className="flex h-screen bg-background">
@@ -117,37 +126,39 @@ export function AppShell({
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1 p-3 overflow-y-auto">
-          {navigation.map((item) => {
-            const isActive =
-              pathname === item.href ||
-              pathname?.startsWith(item.href + "/")
+          {navigation
+            .filter(item => item.roles.includes(user.role))
+            .map((item) => {
+              const isActive =
+                pathname === item.href ||
+                pathname?.startsWith(item.href + "/")
 
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 transform-gpu",
-                  isActive
-                    ? "bg-emerald-50 text-emerald-700 scale-[1.01]"
-                    : "text-slate-500 opacity-80 hover:opacity-100 hover:bg-slate-100 hover:text-slate-900"
-                )}
-              >
-                {isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-full bg-emerald-500 transition-all duration-300" />
-                )}
-
-                <item.icon
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
                   className={cn(
-                    "size-5 shrink-0 transition-colors duration-200",
-                    isActive ? "text-emerald-600" : "text-slate-400"
+                    "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 transform-gpu",
+                    isActive
+                      ? "bg-emerald-50 text-emerald-700 scale-[1.01]"
+                      : "text-slate-500 opacity-80 hover:opacity-100 hover:bg-slate-100 hover:text-slate-900"
                   )}
-                />
+                >
+                  {isActive && (
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-full bg-emerald-500 transition-all duration-300" />
+                  )}
 
-                {!collapsed && <span>{item.name}</span>}
-              </Link>
-            )
-          })}
+                  <item.icon
+                    className={cn(
+                      "size-5 shrink-0 transition-colors duration-200",
+                      isActive ? "text-emerald-600" : "text-slate-400"
+                    )}
+                  />
+
+                  {!collapsed && <span>{item.name}</span>}
+                </Link>
+              )
+            })}
         </nav>
 
         {/* Collapse Toggle */}
@@ -189,9 +200,11 @@ export function AppShell({
                   variant="secondary"
                   className={cn(
                     "text-[10px] px-1.5 py-0",
-                    user.role === "Admin"
+                    user.role === "ADMIN"
                       ? "bg-emerald-500/20 text-emerald-600"
-                      : "bg-cyan-500/20 text-cyan-600"
+                      : user.role === "MANAGER"
+                        ? "bg-blue-500/20 text-blue-600"
+                        : "bg-cyan-500/20 text-cyan-600"
                   )}
                 >
                   {user.role}
@@ -277,7 +290,10 @@ export function AppShell({
                   Settings
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive">
+                <DropdownMenuItem
+                  className="text-destructive"
+                  onClick={handleLogout}
+                >
                   <LogOut className="mr-2 size-4" />
                   Sign out
                 </DropdownMenuItem>
