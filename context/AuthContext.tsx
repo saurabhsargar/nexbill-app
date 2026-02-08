@@ -36,14 +36,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
 
   useEffect(() => {
-    const token = getSession()
-    if (!token) {
-      setLoading(false)
-      return
-    }
+    const syncAuth = async () => {
+      const token = getSession()
 
-    getMe(token)
-      .then((data) => {
+      if (!token) {
+        setUser(null)
+        setOrganization(null)
+        setLoading(false)
+        return
+      }
+
+      try {
+        const data = await getMe(token)
+
         setUser({
           id: data.id,
           name: data.name,
@@ -51,13 +56,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: data.role,
         })
         setOrganization(data.organization)
-      })
-      .catch(() => {
+      } catch {
         clearSession()
         setUser(null)
         setOrganization(null)
-      })
-      .finally(() => setLoading(false))
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    syncAuth()
   }, [])
 
   const logout = () => {
