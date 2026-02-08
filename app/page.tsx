@@ -20,13 +20,14 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [organizationSlug, setOrganizationSlug] = useState("")
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      const data = await loginUser(email, password)
+      const data = await loginUser(email, password, organizationSlug)
 
       // backend returns { access_token }
       setSession(data.access_token)
@@ -48,7 +49,7 @@ export default function LoginPage() {
       }
 
     } catch (err) {
-      alert("Invalid email or password")
+      alert("Invalid credentials or organization")
     } finally {
       setIsLoading(false)
     }
@@ -126,6 +127,18 @@ export default function LoginPage() {
 
           {/* Form */}
           <form onSubmit={handleLogin} className="space-y-5">
+            {/* Organization */}
+            <div className="space-y-2">
+              <Label className="text-slate-700">Organization</Label>
+              <Input
+                type="text"
+                placeholder="your-org-slug"
+                value={organizationSlug}
+                onChange={(e) => setOrganizationSlug(e.target.value)}
+                className="h-11 rounded-xl border-slate-200 bg-slate-50 focus:border-emerald-500 focus:ring-emerald-500"
+              />
+            </div>
+
             {/* Email */}
             <div className="space-y-2">
               <Label className="text-slate-700">Email Address</Label>

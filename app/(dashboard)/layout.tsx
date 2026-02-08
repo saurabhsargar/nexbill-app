@@ -4,13 +4,14 @@ import { AppShell } from "@/components/app-shell";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useRoleGuard } from "@/hooks/useRoleGuard";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useCurrentUser();
+  const { user, organization, loading, logout } = useAuth()
   const router = useRouter();
 
   useRoleGuard(user?.role);
