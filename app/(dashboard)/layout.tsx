@@ -11,7 +11,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, organization, loading, logout } = useAuth()
+  const { user, loading,} = useAuth()
   const router = useRouter();
 
   useRoleGuard(user?.role);
@@ -19,7 +19,7 @@ export default function DashboardLayout({
   if (loading) return null;
 
   if (!user) {
-    router.push("/");
+    router.replace("/");
     return null;
   }
 
