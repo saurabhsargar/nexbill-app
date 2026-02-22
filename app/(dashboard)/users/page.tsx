@@ -128,22 +128,76 @@ export default function UsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">User Management</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            User Management
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Manage users in your organization
+            Manage users and their access permissions.
           </p>
         </div>
 
         {user?.role !== "CASHIER" && (
           <Button
-            className="gap-2"
             onClick={() => setOpenCreate(true)}
-            disabled={loading}
+            className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 
+          hover:from-emerald-600 hover:to-teal-600 text-white 
+          shadow-lg shadow-emerald-500/20"
           >
             <Plus className="size-4" />
             Add User
           </Button>
         )}
+      </div>
+
+      {/* Stats Section */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="border-0 shadow-lg">
+          <CardContent className="flex items-center gap-4 p-6">
+            <div className="flex size-12 items-center justify-center rounded-xl bg-emerald-500/10">
+              <Shield className="size-6 text-emerald-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">
+                {users.filter((u) => u.role === "ADMIN").length}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Administrators
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-lg">
+          <CardContent className="flex items-center gap-4 p-6">
+            <div className="flex size-12 items-center justify-center rounded-xl bg-blue-500/10">
+              <Shield className="size-6 text-blue-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">
+                {users.filter((u) => u.role === "MANAGER").length}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Managers
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-lg">
+          <CardContent className="flex items-center gap-4 p-6">
+            <div className="flex size-12 items-center justify-center rounded-xl bg-cyan-500/10">
+              <Zap className="size-6 text-cyan-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">
+                {users.filter((u) => u.role === "CASHIER").length}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Cashiers
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Search */}
@@ -160,19 +214,19 @@ export default function UsersPage() {
       {/* Users Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {filteredUsers.map((u) => (
-          <Card key={u.id} className="border-0 shadow-md">
+          <Card key={u.id} className="border-0 shadow-lg overflow-hidden">
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <Avatar className="size-12">
+                  <Avatar className="size-12 border-2 border-muted">
                     <AvatarFallback
                       className={cn(
                         "text-white font-semibold",
                         u.role === "ADMIN"
-                          ? "bg-emerald-500"
+                          ? "bg-gradient-to-br from-emerald-500 to-teal-500"
                           : u.role === "MANAGER"
-                            ? "bg-blue-500"
-                            : "bg-cyan-500"
+                            ? "bg-gradient-to-br from-blue-500 to-indigo-500"
+                            : "bg-gradient-to-br from-cyan-500 to-blue-500"
                       )}
                     >
                       {u.name
@@ -207,7 +261,7 @@ export default function UsersPage() {
                 {user?.role === "ADMIN" && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" className="size-8">
                         <MoreVertical className="size-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -216,7 +270,9 @@ export default function UsersPage() {
                         <DropdownMenuItem
                           key={role}
                           disabled={u.id === user?.id}
-                          onClick={() => updateUserRole(u.id, role as User["role"])}
+                          onClick={() =>
+                            updateUserRole(u.id, role as User["role"])
+                          }
                         >
                           Set as {role}
                         </DropdownMenuItem>
@@ -233,7 +289,18 @@ export default function UsersPage() {
                 )}
               </div>
 
-              <p className="text-sm text-muted-foreground">{u.email}</p>
+              <div className="flex items-center justify-between pt-4 border-t">
+                <div className="flex items-center gap-2">
+                  <div className="size-2 rounded-full bg-emerald-500" />
+                  <span className="text-xs text-muted-foreground">
+                    Active User
+                  </span>
+                </div>
+              </div>
+
+              <p className="mt-4 text-sm text-muted-foreground">
+                {u.email}
+              </p>
             </CardContent>
           </Card>
         ))}
