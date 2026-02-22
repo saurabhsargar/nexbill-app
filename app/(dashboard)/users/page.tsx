@@ -53,6 +53,60 @@ export default function UsersPage() {
     }
   }, [])
 
+  const updateUserRole = async (userId: string, role: User["role"]) => {
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}/role`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ role }),
+        }
+      );
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Failed to update role");
+      }
+
+      await fetchUsers();
+    } catch (err) {
+      console.error("Role update failed", err);
+    }
+  };
+
+  const deactivateUser = async (userId: string) => {
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}/deactivate`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message);
+      }
+
+      await fetchUsers();
+    } catch (err) {
+      console.error("Deactivation failed", err);
+    }
+  };
+
   useEffect(() => {
     fetchUsers()
   }, [fetchUsers])
@@ -158,9 +212,21 @@ export default function UsersPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">
-                        Delete
+                      {["ADMIN", "MANAGER", "CASHIER"].map((role) => (
+                        <DropdownMenuItem
+                          key={role}
+                          disabled={u.id === user?.id}
+                          onClick={() => updateUserRole(u.id, role as User["role"])}
+                        >
+                          Set as {role}
+                        </DropdownMenuItem>
+                      ))}
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        disabled={u.id === user?.id}
+                        onClick={() => deactivateUser(u.id)}
+                      >
+                        Deactivate
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
