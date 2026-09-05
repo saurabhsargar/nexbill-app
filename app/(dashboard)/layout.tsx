@@ -1,10 +1,10 @@
 "use client";
 
 import { AppShell } from "@/components/app-shell";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useRoleGuard } from "@/hooks/useRoleGuard";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 
 export default function DashboardLayout({
   children,
@@ -16,11 +16,18 @@ export default function DashboardLayout({
 
   useRoleGuard(user?.role);
 
-  if (loading) return null;
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/");
+    }
+  }, [loading, user, router]);
 
-  if (!user) {
-    router.replace("/");
-    return null;
+  if (loading || !user) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="size-8 animate-spin rounded-full border-2 border-slate-200 border-t-emerald-500" />
+      </div>
+    );
   }
 
   return <AppShell user={user}>{children}</AppShell>;

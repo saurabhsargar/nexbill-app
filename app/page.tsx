@@ -11,11 +11,12 @@ import { Label } from "@/components/ui/label"
 import { Receipt, Eye, EyeOff, Shield, Zap } from "lucide-react"
 import Image from "next/image"
 import { loginUser } from "@/lib/api"
-import { setSession } from "@/lib/auth"
+import { useAuth } from "@/context/AuthContext"
 
 
 export default function LoginPage() {
   const router = useRouter()
+  const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
@@ -29,20 +30,14 @@ export default function LoginPage() {
     try {
       const data = await loginUser(email, password, organizationSlug)
 
-      // backend returns { access_token }
-      setSession(data.access_token)
+      // backend returns { access_token }; login() fetches the authoritative
+      // user/role from /auth/me and updates AuthContext before we navigate
+      const user = await login(data.access_token)
 
-      // fetch user from backend (authoritative)
-      const payload = JSON.parse(
-        atob(data.access_token.split(".")[1])
-      )
-
-      const backendRole = payload.role as "ADMIN" | "MANAGER" | "CASHIER"
-
-      // role-based redirect (REAL)
-      if (backendRole === "ADMIN") {
+      // role-based redirect
+      if (user.role === "ADMIN") {
         router.push("/dashboard")
-      } else if (backendRole === "MANAGER") {
+      } else if (user.role === "MANAGER") {
         router.push("/inventory")
       } else {
         router.push("/billing")

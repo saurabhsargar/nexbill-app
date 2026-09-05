@@ -93,7 +93,7 @@ export function DashboardCharts() {
                     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                   }}
                   labelStyle={{ color: "hsl(var(--foreground))", fontWeight: 600 }}
-                  formatter={(value: number) => [`$${value.toLocaleString()}`, "Sales"]}
+                  formatter={(value?: number) => [`$${(value ?? 0).toLocaleString()}`, "Sales"]}
                 />
                 <Area
                   type="monotone"
@@ -136,7 +136,7 @@ export function DashboardCharts() {
                     border: "1px solid hsl(var(--border))",
                     borderRadius: "8px",
                   }}
-                  formatter={(value: number) => [`${value}%`, "Share"]}
+                  formatter={(value?: number) => [`${value ?? 0}%`, "Share"]}
                 />
               </PieChart>
             </ResponsiveContainer>

@@ -9,7 +9,3 @@ export function getSession() {
 export function clearSession() {
   localStorage.removeItem("access_token");
 }
-
-export function logout() {
-  localStorage.removeItem("access_token")
-}

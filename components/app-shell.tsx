@@ -2,7 +2,7 @@
 
 import { useState, useEffect, type ReactNode } from "react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -32,17 +32,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { clearSession } from "@/lib/auth"
+import { useAuth } from "@/context/AuthContext"
+import { routeAccessMap } from "@/config/route-access"
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["ADMIN", "MANAGER"] },
-  { name: "Billing", href: "/billing", icon: Receipt, roles: ["ADMIN", "MANAGER", "CASHIER"] },
-  { name: "Inventory", href: "/inventory", icon: Package, roles: ["ADMIN", "MANAGER"] },
-  { name: "Users", href: "/users", icon: Users, roles: ["ADMIN"] },
-  { name: "Reports", href: "/reports", icon: BarChart3, roles: ["ADMIN", "MANAGER"] },
-  { name: "Accounting", href: "/accounting", icon: Calculator, roles: ["ADMIN"] },
-  { name: "Utilities", href: "/utilities", icon: HardDrive, roles: ["ADMIN"] },
-  { name: "Settings", href: "/settings", icon: Settings, roles: ["ADMIN", "MANAGER"] },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Billing", href: "/billing", icon: Receipt },
+  { name: "Inventory", href: "/inventory", icon: Package },
+  { name: "Users", href: "/users", icon: Users },
+  { name: "Reports", href: "/reports", icon: BarChart3 },
+  { name: "Accounting", href: "/accounting", icon: Calculator },
+  { name: "Utilities", href: "/utilities", icon: HardDrive },
+  { name: "Settings", href: "/settings", icon: Settings },
 ]
 
 interface AppShellProps {
@@ -85,12 +86,7 @@ export function AppShell({
     setMounted(true)
   }, [])
 
-  const router = useRouter();
-
-  const handleLogout = () => {
-    clearSession();
-    router.push("/");
-  };
+  const { logout } = useAuth();
 
 
   return (
@@ -127,7 +123,7 @@ export function AppShell({
         {/* Navigation */}
         <nav className="flex-1 space-y-1 p-3 overflow-y-auto">
           {navigation
-            .filter(item => item.roles.includes(user.role))
+            .filter(item => routeAccessMap[item.href]?.includes(user.role))
             .map((item) => {
               const isActive =
                 pathname === item.href ||
@@ -292,7 +288,7 @@ export function AppShell({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-destructive"
-                  onClick={handleLogout}
+                  onClick={logout}
                 >
                   <LogOut className="mr-2 size-4" />
                   Sign out

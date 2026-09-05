@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
-import { getSession, clearSession } from "@/lib/auth"
+import { getSession, setSession, clearSession } from "@/lib/auth"
 import { getMe } from "@/lib/api"
 import { useRouter } from "next/navigation"
 
@@ -24,6 +24,7 @@ interface AuthContextType {
   user: User | null
   organization: Organization | null
   loading: boolean
+  login: (token: string) => Promise<User>
   logout: () => void
 }
 
@@ -34,6 +35,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [organization, setOrganization] = useState<Organization | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+
+  const fetchAndSetUser = async (token: string) => {
+    const data = await getMe(token)
+
+    const fetchedUser: User = {
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      role: data.role,
+    }
+
+    setUser(fetchedUser)
+    setOrganization(data.organization)
+
+    return fetchedUser
+  }
 
   useEffect(() => {
     const syncAuth = async () => {
@@ -47,15 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       try {
-        const data = await getMe(token)
-
-        setUser({
-          id: data.id,
-          name: data.name,
-          email: data.email,
-          role: data.role,
-        })
-        setOrganization(data.organization)
+        await fetchAndSetUser(token)
       } catch {
         clearSession()
         setUser(null)
@@ -68,6 +77,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     syncAuth()
   }, [])
 
+  const login = async (token: string) => {
+    setSession(token)
+    setLoading(true)
+
+    try {
+      return await fetchAndSetUser(token)
+    } catch (err) {
+      clearSession()
+      setUser(null)
+      setOrganization(null)
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const logout = () => {
     clearSession()
 
@@ -77,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, organization, loading, logout }}>
+    <AuthContext.Provider value={{ user, organization, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   )
