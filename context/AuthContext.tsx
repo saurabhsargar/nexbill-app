@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { getSession, setSession, clearSession } from "@/lib/auth"
-import { getMe } from "@/lib/api"
+import { getMe } from "@/lib/api/auth"
 import { useRouter } from "next/navigation"
 
 type Role = "ADMIN" | "MANAGER" | "CASHIER"
@@ -36,8 +36,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
-  const fetchAndSetUser = async (token: string) => {
-    const data = await getMe(token)
+  const fetchAndSetUser = async () => {
+    const data = await getMe()
 
     const fetchedUser: User = {
       id: data.id,
@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       try {
-        await fetchAndSetUser(token)
+        await fetchAndSetUser()
       } catch {
         clearSession()
         setUser(null)
@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(true)
 
     try {
-      return await fetchAndSetUser(token)
+      return await fetchAndSetUser()
     } catch (err) {
       clearSession()
       setUser(null)

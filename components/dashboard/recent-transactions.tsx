@@ -2,67 +2,24 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
-import { CreditCard, Smartphone, Banknote, ArrowRight } from "lucide-react"
+import { CreditCard, Smartphone, Banknote, ArrowRight, Receipt } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { useRecentTransactions } from "@/hooks/queries/use-dashboard"
+import { formatCurrency, formatDateTime } from "@/lib/format"
+import type { PaymentMethod } from "@/types/invoice"
 
-const transactions = [
-  {
-    id: "INV-001",
-    customer: "John Smith",
-    amount: 245.50,
-    method: "card" as const,
-    status: "completed" as const,
-    time: "2 min ago",
-  },
-  {
-    id: "INV-002",
-    customer: "Sarah Johnson",
-    amount: 89.99,
-    method: "upi" as const,
-    status: "completed" as const,
-    time: "15 min ago",
-  },
-  {
-    id: "INV-003",
-    customer: "Mike Brown",
-    amount: 567.00,
-    method: "cash" as const,
-    status: "pending" as const,
-    time: "32 min ago",
-  },
-  {
-    id: "INV-004",
-    customer: "Emily Davis",
-    amount: 123.75,
-    method: "card" as const,
-    status: "completed" as const,
-    time: "1 hr ago",
-  },
-  {
-    id: "INV-005",
-    customer: "Robert Wilson",
-    amount: 890.00,
-    method: "upi" as const,
-    status: "completed" as const,
-    time: "2 hr ago",
-  },
-]
-
-const methodIcons = {
-  card: CreditCard,
-  upi: Smartphone,
-  cash: Banknote,
-}
-
-const statusColors = {
-  completed: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-  pending: "bg-amber-500/10 text-amber-500 border-amber-500/20",
-  failed: "bg-rose-500/10 text-rose-500 border-rose-500/20",
+const methodIcons: Record<PaymentMethod, typeof CreditCard> = {
+  CARD: CreditCard,
+  UPI: Smartphone,
+  CASH: Banknote,
 }
 
 export function RecentTransactions() {
+  const { data: transactions, isLoading } = useRecentTransactions(5)
+
   return (
     <Card className="border border-border">
       <CardHeader className="flex flex-row items-center justify-between">
@@ -75,40 +32,53 @@ export function RecentTransactions() {
         </Link>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {transactions.map((transaction) => {
-            const MethodIcon = methodIcons[transaction.method]
-            return (
-              <div
-                key={transaction.id}
-                className="flex items-center justify-between rounded-xl bg-muted/50 p-3 transition-colors hover:bg-muted"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-background shadow-sm">
-                    <MethodIcon className="size-5 text-muted-foreground" />
+        {isLoading ? (
+          <div className="space-y-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-16 rounded-xl" />
+            ))}
+          </div>
+        ) : !transactions || transactions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground">
+            <Receipt className="size-10 opacity-50" />
+            <p className="text-sm font-medium">No transactions yet</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {transactions.map((transaction) => {
+              const MethodIcon = methodIcons[transaction.paymentMethod] ?? Banknote
+              return (
+                <div
+                  key={transaction.id}
+                  className="flex items-center justify-between rounded-xl bg-muted/50 p-3 transition-colors hover:bg-muted"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-10 items-center justify-center rounded-lg bg-background shadow-sm">
+                      <MethodIcon className="size-5 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{transaction.customerName}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {transaction.invoiceNumber} • {formatDateTime(transaction.createdAt)}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium">{transaction.customer}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {transaction.id} • {transaction.time}
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <Badge
+                      variant="outline"
+                      className={cn("text-xs capitalize", "bg-emerald-500/10 text-emerald-500 border-emerald-500/20")}
+                    >
+                      {transaction.status.toLowerCase()}
+                    </Badge>
+                    <span className="text-sm font-semibold font-mono">
+                      {formatCurrency(transaction.amount)}
+                    </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Badge
-                    variant="outline"
-                    className={cn("text-xs capitalize", statusColors[transaction.status])}
-                  >
-                    {transaction.status}
-                  </Badge>
-                  <span className="text-sm font-semibold font-mono">
-                    ${transaction.amount.toFixed(2)}
-                  </span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+          </div>
+        )}
       </CardContent>
     </Card>
   )

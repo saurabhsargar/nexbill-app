@@ -71,6 +71,7 @@ export function AppShell({
   }, [])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reads a browser-only API, can't run during render/SSR
     setIsOnline(navigator.onLine)
     const handleOnline = () => setIsOnline(true)
     const handleOffline = () => setIsOnline(false)
@@ -83,6 +84,7 @@ export function AppShell({
   }, [])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- standard client-mount guard to avoid hydration mismatch on the live clock
     setMounted(true)
   }, [])
 
@@ -255,12 +257,11 @@ export function AppShell({
             </div>
 
             {/* Notifications */}
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="size-5" />
-              <span className="absolute -top-0.5 -right-0.5 size-4 rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground flex items-center justify-center">
-                3
-              </span>
-            </Button>
+            <Link href="/settings?tab=notifications">
+              <Button variant="ghost" size="icon">
+                <Bell className="size-5" />
+              </Button>
+            </Link>
 
             {/* User Menu */}
             <DropdownMenu>

@@ -3,9 +3,12 @@ import type { Metadata } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from "@/context/AuthContext"
+import { ThemeProvider } from "@/components/theme-provider"
+import { QueryProvider } from "@/lib/query-client"
+import { Toaster } from "@/components/ui/sonner"
 
-const _inter = Inter({ subsets: ["latin"] });
-const _jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono" });
 
 export const metadata: Metadata = {
   title: 'NexBill - Modern Billing & POS System',
@@ -36,9 +39,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`font-sans antialiased`}>
-         <AuthProvider>{children}</AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <QueryProvider>
+            <AuthProvider>{children}</AuthProvider>
+            <Toaster richColors position="top-right" closeButton />
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

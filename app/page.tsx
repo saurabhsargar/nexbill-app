@@ -4,13 +4,14 @@ import React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Receipt, Eye, EyeOff, Shield, Zap } from "lucide-react"
+import { Eye, EyeOff } from "lucide-react"
 import Image from "next/image"
-import { loginUser } from "@/lib/api"
+import { loginUser } from "@/lib/api/auth"
+import { getErrorMessage } from "@/lib/api/client"
+import { toast } from "sonner"
 import { useAuth } from "@/context/AuthContext"
 
 
@@ -44,7 +45,7 @@ export default function LoginPage() {
       }
 
     } catch (err) {
-      alert("Invalid credentials or organization")
+      toast.error(getErrorMessage(err, "Invalid credentials or organization"))
     } finally {
       setIsLoading(false)
     }

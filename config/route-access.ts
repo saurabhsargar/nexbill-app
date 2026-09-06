@@ -8,5 +8,5 @@ export const routeAccessMap: Record<string, Role[]> = {
   "/reports": ["ADMIN", "MANAGER"],
   "/accounting": ["ADMIN"],
   "/utilities": ["ADMIN"],
-  "/settings": ["ADMIN", "MANAGER"],
+  "/settings": ["ADMIN", "MANAGER", "CASHIER"],
 };
