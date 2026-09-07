@@ -13,7 +13,6 @@ const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jet
 export const metadata: Metadata = {
   title: 'NexBill - Modern Billing & POS System',
   description: 'Enterprise-grade billing system with offline capability',
-  generator: 'v0.app',
   icons: {
     icon: [
       {
